@@ -196,7 +196,7 @@ class NameRandomizer:
                 # 写入带序号的乱序名单
                 for idx, (name, notes) in enumerate(self.shuffled_list, 1):
                     line_content = f"{name}-{notes}" if notes else name
-                    f.write(f"{idx}. {line_content}\n")
+                    f.write(f"{idx}.{line_content}\n")
         except Exception as e:
             messagebox.showerror("错误", f"文件保存失败: {e}")
             return
