@@ -164,7 +164,7 @@ class NameRandomizer:
         for idx in range(display_limit):
             name, notes = self.shuffled_list[idx]
             line_content = f"{name}-{notes}" if notes else name
-            self.preview_text.insert(tk.END, f"{idx + 1}. {line_content}\n")
+            self.preview_text.insert(tk.END, f"{idx + 1}.{line_content}\n")
 
         # 提示更多未显示的内容
         if len(self.shuffled_list) > 20:
