@@ -9,8 +9,8 @@ QWidget#headerWidget {
 
 QLabel#titleLabel {
     color: #16202a;
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 16pt;
+    font-weight: bold;
 }
 
 QFrame#controlFrame,
@@ -21,8 +21,8 @@ QWidget#previewContainer {
 QLabel#fileLabel,
 QLabel#summaryLabel {
     color: #52606d;
-    font-size: 13px;
-    line-height: 18px;
+    font-size: 12pt;
+    font-weight: normal;
 }
 
 QPushButton {
@@ -32,8 +32,8 @@ QPushButton {
     background: #ffffff;
     color: #243447;
     padding: 0 14px;
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 11pt;
+    font-weight: normal;
 }
 
 QPushButton:hover {
@@ -59,8 +59,8 @@ QPushButton#importButton {
 }
 
 QPushButton#importButton:hover {
-    background: #1d4ed8;
-    border-color: #1d4ed8;
+    background: #338EEF;
+    border-color: #338EEF;
 }
 
 QPushButton#importButton:pressed {
@@ -68,24 +68,22 @@ QPushButton#importButton:pressed {
     border-color: #1e40af;
 }
 
-QPushButton#helpButton {
-    min-width: 32px;
-    min-height: 32px;
-    max-width: 32px;
-    max-height: 32px;
-    border-radius: 16px;
-    border: 1px solid #d6dce3;
-    background: #ffffff;
+QToolButton#helpButton {
+    min-width: 24px;
+    min-height: 24px;
+    max-width: 24px;
+    max-height: 24px;
+    border: none;
+    background: transparent;
     padding: 0;
 }
 
-QPushButton#helpButton:hover {
-    background: #eef5ff;
-    border-color: #8fb5f2;
+QToolButton#helpButton:hover {
+    background: transparent;
 }
 
-QPushButton#helpButton:pressed {
-    background: #dceafe;
+QToolButton#helpButton:pressed {
+    background: transparent;
 }
 
 QTextEdit#previewText {
@@ -94,12 +92,31 @@ QTextEdit#previewText {
     background: #ffffff;
     color: #1f2933;
     padding: 12px;
+    font-size: 11pt;
+    font-weight: normal;
     selection-background-color: #bfdbfe;
     selection-color: #111827;
 }
 
 QDialog {
     background: #f7f8fa;
+}
+
+QDialog#usageDialog {
+    background: transparent;
+    border: none;
+}
+
+QFrame#usageDialogCard {
+    background: #f7f8fa;
+    border: 2px solid #d8dee6;
+    border-radius: 20px;
+}
+
+QLabel#usageTitleLabel {
+    color: #16202a;
+    font-size: 16pt;
+    font-weight: bold;
 }
 
 QDialog QTextEdit {
@@ -112,12 +129,31 @@ QDialog QTextEdit {
     selection-color: #111827;
 }
 
+QPushButton#usageConfirmButton {
+    min-width: 72px;
+    background: #2783E5;
+    border-color: #2783E5;
+    color: #ffffff;
+}
+
+QPushButton#usageConfirmButton:hover {
+    background: #3395ED;
+    border-color: #3395ED;
+}
+
+QPushButton#usageConfirmButton:pressed {
+    background: #1E74D1;
+    border-color: #1E74D1;
+}
+
 QTableWidget#summaryTable {
     border: 1px solid #d8dee6;
     border-radius: 8px;
     background: #ffffff;
     color: #243447;
     gridline-color: #edf0f3;
+    font-size: 12pt;
+    font-weight: normal;
     selection-background-color: transparent;
     selection-color: #243447;
 }
@@ -133,7 +169,8 @@ QHeaderView::section {
     border: none;
     border-bottom: 1px solid #d8dee6;
     padding: 7px 8px;
-    font-weight: 600;
+    font-size: 11pt;
+    font-weight: bold;
 }
 
 QScrollBar:vertical {

@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
     QStyle,
     QTableWidget,
     QTextEdit,
+    QToolButton,
     QVBoxLayout,
     QWidget,
 )
@@ -45,16 +46,16 @@ class MainWindowUI:
 
         self.title_label = QLabel("接龙文本生成器 - 随机排序版")
         self.title_label.setObjectName("titleLabel")
-        title_font = QFont("黑体", 14)
+        title_font = QFont("微软雅黑")
         self.title_label.setFont(title_font)
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         header_layout.addWidget(self.title_label, 0, 1)
 
-        self.help_button = QPushButton()
+        self.help_button = QToolButton()
         self.help_button.setObjectName("helpButton")
         self.help_button.setIcon(window.style().standardIcon(QStyle.StandardPixmap.SP_MessageBoxQuestion))
-        self.help_button.setIconSize(QSize(18, 18))
-        self.help_button.setFixedSize(32, 32)
+        self.help_button.setIconSize(QSize(22, 22))
+        self.help_button.setFixedSize(24, 24)
         self.help_button.setToolTip("使用说明")
         self.help_button.setAccessibleName("使用说明")
         self.help_button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
@@ -70,7 +71,9 @@ class MainWindowUI:
         control_layout.setSpacing(8)
         main_layout.addWidget(self.control_frame, 1, 0)
 
-        button_font = QFont("微软雅黑", 12)
+        # ========== Buttons ==========
+
+        button_font = QFont("微软雅黑")
 
         self.import_button = QPushButton("导入名单")
         self.import_button.setObjectName("importButton")
@@ -93,7 +96,9 @@ class MainWindowUI:
         self.export_button.setEnabled(False)
         control_layout.addWidget(self.export_button)
 
-        info_font = QFont("微软雅黑", 11)
+        # ========== Data Information ==========
+
+        info_font = QFont("微软雅黑")
 
         self.file_label = QLabel("当前文件：未选择")
         self.file_label.setObjectName("fileLabel")
@@ -126,6 +131,8 @@ class MainWindowUI:
         control_layout.addSpacing(10)
         control_layout.addWidget(self.summary_table, 1)
 
+        # ========== Preview Window ==========
+
         self.preview_container = QWidget()
         self.preview_container.setObjectName("previewContainer")
         preview_layout = QVBoxLayout(self.preview_container)
@@ -135,7 +142,7 @@ class MainWindowUI:
 
         self.preview_text = QTextEdit()
         self.preview_text.setObjectName("previewText")
-        self.preview_text.setFont(QFont("微软雅黑", 10))
+        self.preview_text.setFont(QFont("微软雅黑"))
         self.preview_text.setReadOnly(True)
         self.preview_text.setLineWrapMode(QTextEdit.LineWrapMode.WidgetWidth)
         preview_layout.addWidget(self.preview_text, 1)

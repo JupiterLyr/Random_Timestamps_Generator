@@ -214,7 +214,7 @@ class NameRandomizer:
 
     def _load_instruction_contents(self):
         """读取使用说明文本"""
-        instruction_path = Path(__file__).parent / "resource/chain_text_gen_instruction"
+        instruction_path = Path(__file__).parent / "resource/chain_text_gen_instruction.txt"
         try:
             return instruction_path.read_text(encoding=FILE_ENCODING)
         except FileNotFoundError:

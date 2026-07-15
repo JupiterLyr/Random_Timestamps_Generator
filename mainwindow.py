@@ -8,22 +8,19 @@ from pathlib import Path
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QCursor, QIcon
 from PyQt6.QtWidgets import (
-    QDialog,
     QFileDialog,
     QMessageBox,
     QTableWidgetItem,
-    QTextEdit,
-    QVBoxLayout,
     QMainWindow,
 )
 
+from how2use import show_usage_instructions
 from ui import MainWindowUI
 
 
-VERSION = "3.0.0"
+VERSION = "3.1.0"
 FILE_ENCODING = "utf-8"
 RESOURCE_DIR = Path(__file__).parent / "resource"
-INSTRUCTION_PATH = RESOURCE_DIR / "chain_text_gen_instruction"
 ICON_PATH = RESOURCE_DIR / "icon.png"
 QSS_PATH = RESOURCE_DIR / "chain_text_gen.qss"
 
@@ -46,7 +43,6 @@ class MainWindow(QMainWindow):
         self.description_text = ""
         self.records = []
         self.shuffled_list = []
-        self.instruction_contents = self._load_instruction_contents()
         self.usage_dialog = None
 
         self._connect_signals()
@@ -139,36 +135,12 @@ class MainWindow(QMainWindow):
             self.ui.summary_table.setItem(row, 0, QTableWidgetItem(str(note)))
             self.ui.summary_table.setItem(row, 1, QTableWidgetItem(str(count)))
 
-    def _load_instruction_contents(self):
-        try:
-            return INSTRUCTION_PATH.read_text(encoding=FILE_ENCODING)
-        except FileNotFoundError:
-            return f"未找到使用说明文件：{INSTRUCTION_PATH.name}"
-        except OSError as exc:
-            return f"读取使用说明失败：{exc}"
-
     def _show_usage_instructions(self):
-        if self.usage_dialog and self.usage_dialog.isVisible():
-            self.usage_dialog.raise_()
-            self.usage_dialog.activateWindow()
-            return
-
-        self.usage_dialog = QDialog(self)
-        self.usage_dialog.setWindowTitle("使用说明")
-        self.usage_dialog.setFixedSize(480, 360)
-        self.usage_dialog.setModal(False)
-
-        layout = QVBoxLayout(self.usage_dialog)
-        layout.setContentsMargins(16, 16, 16, 16)
-
-        instruction_text = QTextEdit()
-        instruction_text.setFont(self.ui.summary_label.font())
-        instruction_text.setReadOnly(True)
-        instruction_text.setLineWrapMode(QTextEdit.LineWrapMode.WidgetWidth)
-        instruction_text.setPlainText(self.instruction_contents)
-        layout.addWidget(instruction_text)
-
-        self.usage_dialog.show()
+        self.usage_dialog = show_usage_instructions(
+            self,
+            current_dialog=self.usage_dialog,
+            text_font=self.ui.summary_label.font(),
+        )
 
     def _shuffle_records(self):
         if not self.records:
