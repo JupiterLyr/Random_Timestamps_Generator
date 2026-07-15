@@ -15,7 +15,7 @@ class RandomTimeGenerator:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title(f"随机时间戳生成器 v{VERSION}")
-        self.root.iconbitmap(Path(__file__).parent / 'icon.ico')
+        self.root.iconbitmap(Path(__file__).parent / 'resource/icon.ico')
         self.root.geometry("380x475")
         self.root.resizable(False, False)
 

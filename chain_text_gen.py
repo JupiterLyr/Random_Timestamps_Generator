@@ -2,11 +2,14 @@ import csv
 import os
 import random
 import tkinter as tk
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, font as tkfont, messagebox, ttk
 
-VERSION = "2.1"
+VERSION = "2.4"
+FILE_ENCODING = "utf-8"
+INFO_TEXT_WIDTH = 160
 
 
 class NameRandomizer:
@@ -14,62 +17,120 @@ class NameRandomizer:
         self.root = tk.Tk()
         self.root.title(f"接龙文本生成器 v{VERSION}")
         try:
-            self.root.iconbitmap(Path(__file__).parent / 'icon.ico')
+            self.root.iconbitmap(Path(__file__).parent / 'resource/icon.ico')
         except Exception:
-            pass  # 若无图标文件则忽略
-        self.root.geometry("400x480")
+            messagebox.showwarning("Icon not found", "图标文件缺失，无法成功加载！")  # 若无图标文件则忽略
+        self.root.geometry("640x580")
         self.root.resizable(False, False)
 
         # 核心数据存储
         self.description_text = ""  # 存储第一行第一个单元格的描述性文字
         self.records = []  # 原始解析数据 [(name, notes), ...]
         self.shuffled_list = []  # 打乱后的数据 [(name, notes), ...]
+        self.instruction_contents = self._load_instruction_contents()
 
         # 界面变量
-        self.status_var = tk.StringVar(value="请先导入名单 CSV 文件")
+        self.file_var = tk.StringVar(value="当前文件：未选择")
+        self.summary_var = tk.StringVar(value="名单条数：0")
+        self.usage_window = None
 
         self._build_ui()
+        self._update_summary_display()
 
     def _build_ui(self):
         """UI构建"""
-        # 标题
-        tk.Label(self.root, text="接龙文本生成器 - 随机排序版", font=("黑体", 14), justify="center"
-                 ).pack(pady=15)
+        self.root.grid_columnconfigure(0, weight=0)
+        self.root.grid_columnconfigure(1, weight=1)
+        self.root.grid_rowconfigure(1, weight=1)
 
-        # 按钮控制区
-        btn_frame = tk.Frame(self.root)
-        btn_frame.pack(fill=tk.X, padx=20, pady=5)
+        tk.Label(
+            self.root,
+            text="接龙文本生成器 - 随机排序版",
+            font=("黑体", 14),
+            justify="center"
+        ).grid(row=0, column=0, columnspan=2, pady=(16, 12))
 
-        tk.Button(btn_frame, text="导入名单", command=self._import_csv, font=("宋体", 12), cursor="hand2", width=12,
-                  height=2
-                  ).grid(row=0, column=0, padx=5, pady=5)
+        control_frame = tk.Frame(self.root, padx=20, pady=4)
+        control_frame.grid(row=1, column=0, sticky="nsw")
+        control_frame.grid_columnconfigure(0, weight=1)
+        control_frame.grid_rowconfigure(5, weight=1)
 
-        self.btn_shuffle = tk.Button(btn_frame, text="刷新排序", command=self._shuffle_records,
-                                     font=("宋体", 12), width=12, height=2, state="disabled")
-        self.btn_shuffle.grid(row=0, column=1, padx=5, pady=5)
+        preview_container = tk.Frame(self.root, padx=0, pady=4)
+        preview_container.grid(row=1, column=1, sticky="nsew", padx=(0, 20), pady=(0, 16))
+        preview_container.grid_rowconfigure(1, weight=1)
+        preview_container.grid_columnconfigure(0, weight=1)
 
-        self.btn_export = tk.Button(btn_frame, text="导出为 TXT", command=self._export_txt,
-                                    font=("宋体", 12), width=12, height=2, state="disabled")
-        self.btn_export.grid(row=0, column=2, padx=5, pady=5)
+        tk.Button(control_frame, text="导入名单", command=self._import_csv,
+            font=("宋体", 12), cursor="hand2", width=16, height=2
+        ).grid(row=0, column=0, sticky="ew", pady=4)
 
-        # 状态指示
-        tk.Label(self.root, textvariable=self.status_var, font=("宋体", 10), fg="gray"
-                 ).pack(pady=5)
+        self.btn_shuffle = tk.Button(control_frame, text="刷新排序", command=self._shuffle_records,
+            font=("宋体", 12), width=16, height=2, state="disabled")
+        self.btn_shuffle.grid(row=1, column=0, sticky="ew", pady=4)
 
-        # 预览区分割线与标签
-        tk.Label(self.root, text="当前顺序预览 (仅展示前 20 行):", font=("宋体", 12)
-                 ).pack(anchor="w", padx=20, pady=(10, 2))
+        self.btn_export = tk.Button(control_frame, text="导出为 TXT", command=self._export_txt,
+            font=("宋体", 12), width=16, height=2, state="disabled")
+        self.btn_export.grid(row=2, column=0, sticky="ew", pady=4)
 
-        # 带滚动条的预览窗口
-        preview_frame = tk.Frame(self.root)
-        preview_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 15))
+        tk.Message(control_frame, textvariable=self.file_var, font=("宋体", 11),
+            justify="left", anchor="nw", width=INFO_TEXT_WIDTH
+        ).grid(row=3, column=0, sticky="w", pady=(16, 0))
+
+        tk.Message(control_frame, textvariable=self.summary_var, font=("宋体", 11),
+            justify="left", anchor="nw", width=INFO_TEXT_WIDTH
+        ).grid(row=4, column=0, sticky="w", pady=(12, 0))
+
+        summary_frame = tk.Frame(control_frame)
+        summary_frame.grid(row=5, column=0, sticky="nsew", pady=(6, 0))
+        summary_frame.grid_rowconfigure(0, weight=1)
+        summary_frame.grid_columnconfigure(0, weight=1)
+
+        table_style = ttk.Style()
+        table_style.configure("Summary.Treeview", font=("宋体", 11), rowheight=24)
+        table_style.configure("Summary.Treeview.Heading", font=("宋体", 11))
+
+        self.summary_table = ttk.Treeview(
+            summary_frame,
+            columns=("note", "count"),
+            show="headings",
+            height=1,
+            style="Summary.Treeview"
+        )
+        self.summary_table.heading("note", text="第二列内容")
+        self.summary_table.heading("count", text="次数")
+        self.summary_table.column("note", width=110, anchor="w")
+        self.summary_table.column("count", width=50, anchor="center", stretch=False)
+
+        summary_scrollbar = tk.Scrollbar(summary_frame, command=self.summary_table.yview)
+        self.summary_table.config(yscrollcommand=summary_scrollbar.set)
+
+        self.summary_table.grid(row=0, column=0, sticky="nsew")
+        summary_scrollbar.grid(row=0, column=1, sticky="ns")
+
+        help_font = tkfont.Font(family="宋体", size=10, underline=True)
+        help_frame = tk.Frame(control_frame)
+        help_frame.grid(row=6, column=0, sticky="ew", pady=(10, 0))
+        help_frame.grid_columnconfigure(0, weight=1)
+
+        help_label = tk.Label(help_frame, text="使用说明", font=help_font,
+            fg="#1A5FB4", cursor="hand2")
+        help_label.grid(row=0, column=0)
+        help_label.bind("<Button-1>", self._show_usage_instructions)
+
+        tk.Label(preview_container, text="当前顺序预览（仅展示前 20 行）",
+            font=("宋体", 12), anchor="w").grid(row=0, column=0, sticky="w", pady=(0, 6))
+
+        preview_frame = tk.Frame(preview_container)
+        preview_frame.grid(row=1, column=0, sticky="nsew")
+        preview_frame.grid_rowconfigure(0, weight=1)
+        preview_frame.grid_columnconfigure(0, weight=1)
 
         self.preview_text = tk.Text(preview_frame, font=("宋体", 10), state="disabled", bg="#F5F5F5", wrap="word")
         scrollbar = tk.Scrollbar(preview_frame, command=self.preview_text.yview)
         self.preview_text.config(yscrollcommand=scrollbar.set)
 
-        self.preview_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.preview_text.grid(row=0, column=0, sticky="nsew")
+        scrollbar.grid(row=0, column=1, sticky="ns")
 
     def _import_csv(self):
         """导入并解析CSV文件"""
@@ -83,7 +144,7 @@ class NameRandomizer:
         raw_records = []
         # 兼容 UTF-8(含BOM) 与 GBK 编码
         try:
-            with open(file_path, "r", encoding="utf-8-sig") as f:
+            with open(file_path, "r", encoding=FILE_ENCODING, newline="") as f:
                 reader = csv.reader(f)
                 for row in reader:
                     if row:
@@ -127,13 +188,71 @@ class NameRandomizer:
 
         if not self.records:
             messagebox.showwarning("警告", "未能解析到有效的名单数据（除第一行描述外无其他名单）")
-            self.status_var.set("导入失败")
             self._set_buttons_state("disabled")
             return
 
-        self.status_var.set(f"已导入 {len(self.records)} 条数据")
+        self.file_var.set(f"当前文件：{Path(file_path).name}")
+        self.summary_var.set(f"名单条数：{len(self.records)}")
+        self._update_summary_display()
         self._set_buttons_state("normal")
         self._shuffle_records()
+
+    def _build_summary_items(self):
+        """构建第二列统计结果，仅统计第二列非空内容的出现次数"""
+        notes_counter = Counter(notes for _, notes in self.records if notes)
+        if notes_counter:
+            return sorted(notes_counter.items(), key=lambda item: (-item[1], item[0]))
+        return [("无非空内容", "")]
+
+    def _update_summary_display(self):
+        """刷新第二列统计结果展示区"""
+        for item_id in self.summary_table.get_children():
+            self.summary_table.delete(item_id)
+
+        for note, count in self._build_summary_items():
+            self.summary_table.insert("", tk.END, values=(note, count))
+
+    def _load_instruction_contents(self):
+        """读取使用说明文本"""
+        instruction_path = Path(__file__).parent / "resource/chain_text_gen_instruction"
+        try:
+            return instruction_path.read_text(encoding=FILE_ENCODING)
+        except FileNotFoundError:
+            return f"未找到使用说明文件：{instruction_path.name}"
+        except OSError as e:
+            return f"读取使用说明失败：{e}"
+
+    def _show_usage_instructions(self, _event=None):
+        """打开使用说明窗口"""
+        if self.usage_window and self.usage_window.winfo_exists():
+            self.usage_window.focus_force()
+            return
+
+        self.usage_window = tk.Toplevel(self.root)
+        self.usage_window.title("使用说明")
+        self.usage_window.geometry("480x360")
+        self.usage_window.resizable(False, False)
+        self.usage_window.transient(self.root)
+
+        container = tk.Frame(self.usage_window, padx=16, pady=16)
+        container.pack(fill=tk.BOTH, expand=True)
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+
+        instruction_text = tk.Text(
+            container,
+            font=("宋体", 11),
+            wrap="word",
+            state="normal",
+            bg="#F5F5F5"
+        )
+        instruction_scrollbar = tk.Scrollbar(container, command=instruction_text.yview)
+        instruction_text.config(yscrollcommand=instruction_scrollbar.set)
+        instruction_text.insert("1.0", self.instruction_contents)
+        instruction_text.config(state="disabled")
+
+        instruction_text.grid(row=0, column=0, sticky="nsew")
+        instruction_scrollbar.grid(row=0, column=1, sticky="ns")
 
     def _shuffle_records(self):
         """对名单执行随机洗牌并更新界面预览"""
@@ -188,7 +307,7 @@ class NameRandomizer:
             return
 
         try:
-            with open(file_path, "w", encoding="utf-8") as f:
+            with open(file_path, "w", encoding="utf-8", newline="") as f:
                 # 写入置顶的描述性文字
                 if self.description_text:
                     f.write(f"{self.description_text}\n\n")
