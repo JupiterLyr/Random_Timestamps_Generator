@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang=zh-CN>
+<head>
+    <meta charset='UTF-8'/>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+    <title>接龙文本生成器</title>
+    <script>
+        window.pageVersion = '26071723a';
+        const stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.href = `styles.css?v=${window.pageVersion}`;
+        document.head.append(stylesheet);
+    </script>
+</head>
+<body>
+<main class=app-shell>
+    <header class=page-header>
+        <h1>接龙文本生成器</h1>
+        <button class=icon-button id=helpButton type=button aria-label=查看使用说明>?</button>
+    </header>
+    <section class=workspace>
+        <aside class=control-panel>
+            <div class=drop-zone id=dropZone tabindex=0 role=button>拖放 CSV 到这里<br>或点击选择</div>
+            <input id=fileInput type=file accept='.csv' hidden>
+            <button class=button id=shuffleButton type=button disabled>刷新排序</button>
+            <button class="button button-primary" id=exportButton type=button disabled>导出为 TXT</button>
+            <button class="button button-primary" id=copyButton type=button disabled>复制到剪贴板</button>
+        </aside>
+        <section class=meta-panel>
+            <p>当前文件：<strong id=fileName>未选择</strong></p>
+            <p>名单条数：<strong id=recordCount>0</strong></p>
+            <h2>第二列内容统计</h2>
+            <div class=summary-table-wrap>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>内容</th>
+                        <th>次数</th>
+                    </tr>
+                    </thead>
+                    <tbody id=summaryBody>
+                    <tr>
+                        <td colspan=2>导入名单后显示统计结果</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class=preview-panel>
+            <div class=preview-title><h2>排序结果预览</h2><span id=previewCount>0 条</span></div>
+            <pre id=previewText>导入 CSV 文件后将在这里显示排序结果</pre>
+        </section>
+    </section>
+</main>
+<dialog id=helpDialog>
+    <h2>使用说明</h2>
+    <pre class=help-content id=helpContent></pre>
+    <button class='button button-primary' id=closeHelpButton type=button>我已了解</button>
+</dialog>
+<script>
+    const appScript = document.createElement('script');
+    appScript.src = `app.js?v=${window.pageVersion}`;
+    document.body.append(appScript);
+</script>
+</body>
+</html>
