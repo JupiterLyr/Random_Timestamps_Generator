@@ -46,7 +46,7 @@ class MainWindowUI:
 
         self.title_label = QLabel("接龙文本生成器 - 随机排序版")
         self.title_label.setObjectName("titleLabel")
-        title_font = QFont("微软雅黑")
+        title_font = QFont("思源黑体 CN Bold")
         self.title_label.setFont(title_font)
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         header_layout.addWidget(self.title_label, 0, 1)
@@ -73,7 +73,7 @@ class MainWindowUI:
 
         # ========== Buttons ==========
 
-        button_font = QFont("微软雅黑")
+        button_font = QFont("思源黑体 CN Normal")
 
         self.import_button = QPushButton("导入名单")
         self.import_button.setObjectName("importButton")
@@ -98,7 +98,7 @@ class MainWindowUI:
 
         # ========== Data Information ==========
 
-        info_font = QFont("微软雅黑")
+        info_font = QFont("思源黑体 CN Normal")
 
         self.file_label = QLabel("当前文件：未选择")
         self.file_label.setObjectName("fileLabel")
@@ -142,7 +142,7 @@ class MainWindowUI:
 
         self.preview_text = QTextEdit()
         self.preview_text.setObjectName("previewText")
-        self.preview_text.setFont(QFont("微软雅黑"))
+        self.preview_text.setFont(QFont("思源黑体 CN Normal"))
         self.preview_text.setReadOnly(True)
         self.preview_text.setLineWrapMode(QTextEdit.LineWrapMode.WidgetWidth)
         preview_layout.addWidget(self.preview_text, 1)
