@@ -1,20 +1,74 @@
-# Random Timestamps Generator</br>随机时间戳生成器
-## How to Use?</br>使用方法
-1. Enter the **date range** and **time range** according to the format requirements.
-2. Set the **quantity** to be generated.
-3. Click the **green button** to start random generation, and select the **save location**.
-4. Choose whether to skip a specific time period. If so, set the hour range.
+# 接龙文本生成器
 
-## Update Logs</br>更新日志
-**This section is presented in Simplified Chinese only!**
+一个基于 PyQt6 的桌面工具，用于将 CSV 名单随机排序，并生成适合群接龙使用的 TXT 文本。
 
-### Version 1.3.0
-+ 添加了“跳过特定时间段”的功能，保证在生成随机时间戳的同时，避开用户认为不合理的时间段。
-+ 为生成个数添加了上限值，增设了数据验证、输入框自动更正等功能。
+## 功能
 
-### Version 1.2.0
-**第一个可用版本**！软件已具备基础功能，可以按要求生成正确的时间戳。
-+ 将 `main.py` 的代码结构化，优化了UI设计。
+- 导入 UTF-8 或 GBK 编码的 CSV 名单。
+- 随机排列名单，并支持重复刷新排序结果。
+- 统计第二列附加文字的出现次数。
+- 在导出前预览排序结果。
+- 将完整结果导出为 UTF-8 编码的 TXT 文件，或复制到剪贴板（仅在线工具支持）。
 
-### Version 1.1
-+ 在 `main.py` 中创建了基本的实现框架，设计了软件图标。
+## 环境要求
+
+- Python 3.8 或更高版本
+- PyQt6
+
+安装依赖：
+
+```bash
+pip install PyQt6
+```
+
+## 运行桌面版本
+
+在项目根目录执行：
+
+```bash
+python main.py
+```
+
+## CSV 格式
+
+CSV 文件的第一行第一列作为接龙说明文字。从第二行开始，每行填写一条名单：
+
+```csv
+本次接龙名单
+张三,早班
+李四,晚班
+王五,
+```
+
+- 第一列为姓名，姓名为空的行会被忽略。
+- 第二列为可选的附加文字；为空时，导出内容只显示姓名，不添加连接符 `-`。
+- 文件至少应包含一行说明文字和一行有效名单。
+
+## 项目结构
+
+```text
+随机时间戳生成器/
+├── main.py
+├── mainwindow.py
+├── ui.py
+├── how2use.py
+├── LICENSE
+├── README.md
+├── others/
+│   ├── chain_text_gen.py
+│   └── random_timestamp_gen.py
+├── resource/
+│   ├── chain_text_gen.qss
+│   ├── chain_text_gen_instruction.txt
+│   ├── icon.ico
+│   └── icon.png
+└── web/
+    ├── app.js
+    ├── index.html
+    ├── instruction.txt
+    └── styles.css
+```
+
+## 许可证
+
+本项目使用 [MIT License](LICENSE)。
