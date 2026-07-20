@@ -18,7 +18,7 @@ from how2use import show_usage_instructions
 from ui import MainWindowUI
 
 
-VERSION = "3.1.0"
+VERSION = "3.1.1"
 FILE_ENCODING = "utf-8"
 RESOURCE_DIR = Path(__file__).parent / "resource"
 ICON_PATH = RESOURCE_DIR / "icon.png"
